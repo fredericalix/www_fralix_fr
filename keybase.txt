@@ -1,0 +1,56 @@
+==================================================================
+https://keybase.io/fralix
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of http://fralix.fr
+  * I am fralix (https://keybase.io/fralix) on keybase.
+  * I have a public key ASBX66Um4CZu-WczUtsD8btyusSAMltLLu_lSwowMF4cMAo
+
+To do so, I am signing this object:
+
+{
+  "body": {
+    "key": {
+      "eldest_kid": "012057eba526e0266ef9673352db03f1bb72bac480325b4b2eefe54b0a30305e1c300a",
+      "host": "keybase.io",
+      "kid": "012057eba526e0266ef9673352db03f1bb72bac480325b4b2eefe54b0a30305e1c300a",
+      "uid": "095d134a6fa04f4238e38aa1c1a26c19",
+      "username": "fralix"
+    },
+    "merkle_root": {
+      "ctime": 1574418313,
+      "hash": "b31898afdf95985d9c0066b974700644dd42a8705a55371978b96568077295b07da5252e781069939507a742760c3a8125796e866de004a5bdeac12d0f2128fe",
+      "hash_meta": "b9fb89ccdd8304b4a83f5916a30ffdcfc448cb32194c6fc0e99fc70016d26d4b",
+      "seqno": 10496167
+    },
+    "service": {
+      "entropy": "TlLboVTAEB075I6GNSf/axBf",
+      "hostname": "fralix.fr",
+      "protocol": "http:"
+    },
+    "type": "web_service_binding",
+    "version": 2
+  },
+  "client": {
+    "name": "keybase.io go client",
+    "version": "5.0.0"
+  },
+  "ctime": 1574418327,
+  "expire_in": 504576000,
+  "prev": "d0be1f804cb34a9f13cfba70fb888952fa30a2b1aed32b89c2fcd9c44b64dd9c",
+  "seqno": 6,
+  "tag": "signature"
+}
+
+which yields the signature:
+
+hKRib2R5hqhkZXRhY2hlZMOpaGFzaF90eXBlCqNrZXnEIwEgV+ulJuAmbvlnM1LbA/G7crrEgDJbSy7v5UsKMDBeHDAKp3BheWxvYWTESpcCBsQg0L4fgEyzSp8Tz7pw+4iJUvoworGu0yuJwvzZxEtk3ZzEIBQEkNJZ3c2wEDy3bXVX34/uhfK9iRgqhrgfN5sI+CwZAgHCo3NpZ8RA1wn/LGn57ppHBMlCJ3TXRvnYvBiVlvJNeeT1dbzdLJpYXMuCjl4PCaOeNXtd36nb3uAJY80S1GN5lPTjWYElAKhzaWdfdHlwZSCkaGFzaIKkdHlwZQildmFsdWXEIJS/ayNflduuVtz82irVxMBEqFd/TinnzYWvTQa7Xuuvo3RhZ80CAqd2ZXJzaW9uAQ==
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/fralix
+
+==================================================================

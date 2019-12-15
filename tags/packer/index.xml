@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>packer on Fralix Blog</title>
+    <link>https://www.fralix.fr/tags/packer/</link>
+    <description>Recent content in packer on Fralix Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 09 Aug 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://www.fralix.fr/tags/packer/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Create FreeBSD Current OpenStack image on OVH Public Cloud</title>
+      <link>https://www.fralix.fr/posts/create_freebsd-current_openstack_image_on_ovh_public_cloud/</link>
+      <pubDate>Fri, 09 Aug 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.fralix.fr/posts/create_freebsd-current_openstack_image_on_ovh_public_cloud/</guid>
+      <description>Introduction For my project, I want to use FreeBSD on the OVH&amp;rsquo;s Public Cloud.
+Behind this service, it&amp;rsquo;s OpenStack who run your instances.
+Actually, OVH just offer FreeBSD-11.0. Too old, and I prefer CURRENT branch and recompile it from source every week.
+Another problem is bscloud-init doesn&amp;rsquo;t run on FreeBSD-12 and older because it use an too old version of Python.
+
+Well, before start, I list my needs:
+ FreeBSD-Current branch ZFS growfs during the first boot configure hostname during the boot push key for ssh can execute post-install script generate new hostid at the first boot already configured public net interface  First, I wrote a lightweight shell script to be my cloud-init during instance boot.
+You&amp;rsquo;ll find it into this github repo:
+GitHub - fredericalix/cloud-init: OpenStack FreeBSD cloud-init in bash script
+After some tests, I toke the decision to use HashiCorp Packer to compile the kernel from source and update packages every week.</description>
+    </item>
+    
+  </channel>
+</rss>

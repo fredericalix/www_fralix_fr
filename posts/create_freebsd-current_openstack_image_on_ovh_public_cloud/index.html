@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<title>Create FreeBSD Current OpenStack image on OVH Public Cloud | Fralix Blog</title>
+<meta charset="utf-8">
+<meta name="generator" content="Hugo 0.57.2" />
+<meta name="description" content="FreeBSD images for OVH Public Cloud">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="canonical" href="https://www.fralix.fr/posts/create_freebsd-current_openstack_image_on_ovh_public_cloud/">
+<link rel="alternate" type="application/rss+xml" href="" title="Fralix Blog">
+<link rel="stylesheet" href="https://www.fralix.fr/css/theme.css">
+<link rel="stylesheet" href="https://www.fralix.fr/css/classes.css">
+
+<header class="dark">
+  <h2><a href="https://www.fralix.fr">Fralix Blog</a></h2>
+  <nav>
+    
+      <a href="/">Home</a>
+    
+      <a href="/tags/">Tags</a>
+    
+      <a href="https://www.doyoubuzz.com/alix-frederic">About Me</a>
+    
+  </nav>
+</header>
+
+<article>
+  <header>
+    <h1><a href="https://www.fralix.fr/posts/create_freebsd-current_openstack_image_on_ovh_public_cloud/">Create FreeBSD Current OpenStack image on OVH Public Cloud</a></h1>
+    <p class="meta"><time datetime="2019-08-09T00:00:00Z">August 09, 2019</time></p>
+  </header>
+  <nav id="TableOfContents">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#install-freebsd-current-in-a-qemu-vm">Install FreeBSD-CURRENT in a QEMU VM</a>
+<ul>
+<li><a href="#prerequisites">Prerequisites</a></li>
+<li><a href="#create-vm-on-the-workstation">Create VM on the workstation</a>
+<ul>
+<li><a href="#freebsd-installation-steps">FreeBSD installation steps</a></li>
+</ul></li>
+<li><a href="#configure-freebsd-before-push-it-on-openstack">Configure FreeBSD before push it on OpenStack</a>
+<ul>
+<li><a href="#put-packer-ssh-key-on-freebsd-account">Put packer ssh key on freebsd account</a></li>
+</ul></li>
+<li><a href="#install-packages">Install packages</a>
+<ul>
+<li><a href="#dhcp-client-configuration-for-ovh-network-route">dhcp client configuration for OVH network route</a></li>
+<li><a href="#few-openstack-specific-changes">Few OpenStack-specific changes</a></li>
+</ul></li>
+<li><a href="#shrink-image">Shrink image</a></li>
+</ul></li>
+<li><a href="#upload-your-freebsd-openstack-image-to-ovh-public-cloud">Upload your FreeBSD openstack image to OVH Public Cloud</a></li>
+<li><a href="#using-hashicorp-packer-to-build-the-final-freebsd-current-openstack-image">Using HashiCorp Packer to build the final FreeBSD-CURRENT OpenStack image</a></li>
+</ul>
+</nav>
+
+  
+
+<p><img src="/pictures/freebsd_OVH-create/1.png" alt="freebsd-current build openstack image (1).png" /></p>
+
+<h1 id="introduction">Introduction</h1>
+
+<p>For my project, I want to use FreeBSD on the OVH&rsquo;s Public Cloud.<br />
+Behind this service, it&rsquo;s OpenStack who run your instances.<br />
+Actually, OVH just offer FreeBSD-11.0. Too old, and I prefer CURRENT branch and recompile it from source every week.<br />
+Another problem is bscloud-init doesn&rsquo;t run on FreeBSD-12 and older because it use an too old version of Python.</p>
+
+<p><br />
+Well, before start, I list my needs:</p>
+
+<ul>
+<li>FreeBSD-Current branch</li>
+<li>ZFS</li>
+<li>growfs during the first boot</li>
+<li>configure hostname during the boot</li>
+<li>push key for ssh</li>
+<li>can execute post-install script</li>
+<li>generate new hostid at the first boot</li>
+<li>already configured public net interface</li>
+</ul>
+
+<p>First, I wrote a lightweight shell script to be my cloud-init during instance boot.<br />
+You&rsquo;ll find it into this github repo:<br />
+<a href="https://github.com/fredericalix/cloud-init">GitHub - fredericalix/cloud-init: OpenStack FreeBSD cloud-init in bash script</a></p>
+
+<p>After some tests, I toke the decision to use <a href="https://www.packer.io">HashiCorp Packer</a> to compile the kernel from source and update packages every week.<br />
+Before that, I need a minimum things. My first image must boot and configure ip address by DHCP and include the public ssh key used by my packer template.<br />
+I&rsquo;ll create it on my workstation in qemu, and upload it with OpenStack CLI.<br />
+To finish, I&rsquo;ll execute the Packer template who install cloud-init, pull FreeBSD-CURRENT source, compile it, update pkg and create the final OpenStack image.</p>
+
+<h1 id="install-freebsd-current-in-a-qemu-vm">Install FreeBSD-CURRENT in a QEMU VM</h1>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<ul>
+<li>In this case, I&rsquo;ll build the first image on my Ubuntu workstation with virt-manager <code>(sudo apt install -y virt-manager</code>)</li>
+<li>You&rsquo;ll need openstack client. On ubuntu, install it with <code>sudo apt install -y python3-openstackclient</code></li>
+<li>Install packer on your workstation → <a href="https://www.packer.io/downloads.html">Download Packer - Packer by HashiCorp</a></li>
+<li>Download FreeBSD-CURRENT iso at <a href="http://ftp0.bme.freebsd.org/pub/FreeBSD/snapshots/ISO-IMAGES/13.0/">Index of /pub/FreeBSD/snapshots/ISO-IMAGES/13.0/</a></li>
+<li>Create a ssh key for Packer : <code>ssh-keygen -t rsa -b 4096 -f \~/.ssh/id_rsa_packer</code></li>
+<li>Download openrc concerning your Public Cloud project.</li>
+</ul>
+
+<p>Go to <a href="https://www.ovh.com/manager/public-cloud/index.htm￼Project">https://www.ovh.com/manager/public-cloud/index.htm</a></p>
+
+<p>Project Management → Users &amp; Roles → Create User</p>
+
+<p><img src="/pictures/freebsd_OVH-create/2.png" alt="6391c28b-4c94-46f6-8019-d632afce65d4.png" /></p>
+
+<p><img src="/pictures/freebsd_OVH-create/3.png" alt="73db26da-4228-4045-bb66-4332fd350f9f.png" /></p>
+
+<p><img src="/pictures/freebsd_OVH-create/4.png" alt="3e4684ca-1149-4b1d-b973-41c32786fe8c.png" /></p>
+
+<p>Save your password into your password manager ;)</p>
+
+<p><img src="/pictures/freebsd_OVH-create/4.png" alt="099a5fa4-440e-4e6f-8a46-94d9e6e5dcdf.png" /></p>
+
+<p><br />
+  Project Management → Users &amp; Roles → &hellip; → Download OpenStack&rsquo;s RC file</p>
+
+<p><img src="/pictures/freebsd_OVH-create/5.png" alt="147c9ec2-05b2-49e4-9740-b38ad4a53eef.png" /></p>
+
+<p>Select your region and user OpenRC v3 config file and click Download</p>
+
+<p><img src="/pictures/freebsd_OVH-create/6.png" alt="f85d0f20-ce5d-4a1f-b7bf-51196ab68bbf.png" /></p>
+
+<h2 id="create-vm-on-the-workstation">Create VM on the workstation</h2>
+
+<p>I&rsquo;ll don&rsquo;t explain how to use virt-manager. You&rsquo;ll find a lot of documentation into your favorite search engine.<br />
+The most important is:</p>
+
+<ul>
+<li>4 GB of RAM</li>
+<li>1 vcpu is enough to install</li>
+<li>use virtio for your virtual hard drive</li>
+<li>use virtio for your virtual network card</li>
+</ul>
+
+<h3 id="freebsd-installation-steps">FreeBSD installation steps</h3>
+
+<p><img src="/pictures/freebsd_OVH-create/7.png" alt="fca4b106-c716-4d38-9620-731abc0644bd.png" /></p>
+
+<p><img src="/pictures/freebsd_OVH-create/8.png" alt="71690d09-90ce-44d7-98b2-cb027f0e3022.png" /></p>
+
+<p><img src="/pictures/freebsd_OVH-create/9.png" alt="aa457c2a-1b00-4d94-87bd-7a9072b1c364.png" /></p>
+
+<p><img src="/pictures/freebsd_OVH-create/10.png" alt="e8ec9d3e-aef8-4051-be84-8fd1c5b63eef.png" /></p>
+
+<p><img src="/pictures/freebsd_OVH-create/11.png" alt="4db8a30e-8440-4196-b586-0a7d5cb428d7.png" /></p>
+
+<p><img src="/pictures/freebsd_OVH-create/12.png" alt="e6e5f965-66d0-4fa3-ad37-50029860c5f4.png" /></p>
+
+<p><img src="/pictures/freebsd_OVH-create/13.png" alt="0eee6b04-1936-41e9-be18-5dbedb0107bd.png" /></p>
+
+<p><img src="/pictures/freebsd_OVH-create/14.png" alt="d0c9a312-4e4a-437b-b932-bd15676fcbe9.png" /></p>
+
+<p><img src="/pictures/freebsd_OVH-create/14.png" alt="e279909d-c662-4335-b358-bb9dd8711840.png" /></p>
+
+<p><img src="/pictures/freebsd_OVH-create/16.png" alt="cbee95c6-0bd7-47c3-84be-33183a1d4753.png" /></p>
+
+<p><img src="/pictures/freebsd_OVH-create/17.png" alt="cc270ce9-d7c6-47fb-856f-2a0b19839748.png" /></p>
+
+<p><img src="/pictures/freebsd_OVH-create/18.png" alt="fc8d51a0-9184-4e00-97f7-b22b187aaa98.png" /></p>
+
+<p><img src="/pictures/freebsd_OVH-create/19.png" alt="6a241cf7-f220-45c2-8caf-f43cb8634be8.png" /></p>
+
+<p><img src="/pictures/freebsd_OVH-create/20.png" alt="f7c9c9b6-076a-46fe-a4d1-5289786a3db1.png" /></p>
+
+<p><img src="/pictures/freebsd_OVH-create/21.png" alt="04e1bb56-b7af-44ce-90d6-ad9368dd3da6.png" /></p>
+
+<p><img src="/pictures/freebsd_OVH-create/22.png" alt="e2119d3c-aebf-4ad9-af56-57bba34ec1f5.png" /></p>
+
+<p><img src="/pictures/freebsd_OVH-create/23.png" alt="1cb3881d-385b-441f-8502-44651481173b.png" /></p>
+
+<p><img src="/pictures/freebsd_OVH-create/24.png" alt="bce2b6a4-7584-4bfa-9cac-187c0fb6927c.png" /></p>
+
+<p><img src="/pictures/freebsd_OVH-create/25.png" alt="2d4c793a-831d-4cd2-8142-ad441158dc50.png" /></p>
+
+<p><img src="/pictures/freebsd_OVH-create/26.png" alt="282e558f-1b92-4978-9bb6-f74f67f48a3c.png" /></p>
+
+<p>Create a <code>freebsd</code>user. It will be the only user of your instance when you&rsquo;ll create it.<br />
+Later we&rsquo;ll give it admin privileges with <code>sudo</code>.</p>
+
+<p><img src="/pictures/freebsd_OVH-create/27.png" alt="da420cb6-8999-477a-8765-3fedc0d2c8e1.png" /></p>
+
+<p><img src="/pictures/freebsd_OVH-create/28.png" alt="cdd6ca6e-34aa-4fa0-9349-6534a3b668e6.png" /></p>
+
+<p><img src="/pictures/freebsd_OVH-create/29.png" alt="1d7aa65a-3d02-4ba1-b8e0-4e9ce97545c0.png" /></p>
+
+<h2 id="configure-freebsd-before-push-it-on-openstack">Configure FreeBSD before push it on OpenStack</h2>
+
+<p>On the console connect with root user to show the ip address</p>
+
+<p><img src="/pictures/freebsd_OVH-create/30.png" alt="54d25f92-e0bc-434e-9142-84cc7a7067c9.png" /></p>
+
+<p>Now you can connect to it by ssh</p>
+
+<pre><code>ssh freebsd@192.168.122.250
+</code></pre>
+
+<p>But before we need to install and configure sudo. Stay connected in your QEMU console and type:</p>
+
+<pre><code>pkg update
+pkg install -y sudo
+visudo
+</code></pre>
+
+<p>Insert this line into the visudo editor:</p>
+
+<pre><code>freebsd ALL=(ALL) NOPASSWD: ALL
+</code></pre>
+
+<p>Now you can connect to your vm by ssh. It will be more easy to edit your files.</p>
+
+<h3 id="put-packer-ssh-key-on-freebsd-account">Put packer ssh key on freebsd account</h3>
+
+<pre><code>mkdir .ssh
+chmod go-rwx .ssh
+cd .ssh
+vi authorized_keys
+</code></pre>
+
+<p>Paste your <code>\~/.ssh/id_rsa_packer.pub</code> in <code>authorized_keys</code></p>
+
+<h2 id="install-packages">Install packages</h2>
+
+<pre><code>sudo pkg install -y bash wget curl
+</code></pre>
+
+<h3 id="dhcp-client-configuration-for-ovh-network-route">dhcp client configuration for OVH network route</h3>
+
+<p><code>sudo vi /etc/dhclient-exit-hooks</code></p>
+
+<pre><code># This script fixes injection of the default route on OVH /cloud.
+# See dhclient-script(8) for more details.
+
+# Force-add a static route to our gateway (otherwise unreachable)
+# and re-declare it as the default route (as previous declaration failed)
+case &quot;${reason}&quot; in
+    &quot;BOUND&quot;|&quot;RENEW&quot;|&quot;REBIND&quot;|&quot;REBOOT&quot;)
+        route add &quot;${new_routers}&quot; -iface &quot;${interface}&quot;
+        route add default &quot;${new_routers}&quot;
+        ;;
+    *)
+        ;;
+esac
+</code></pre>
+
+<h3 id="few-openstack-specific-changes">Few OpenStack-specific changes</h3>
+
+<pre><code>sudo -s
+echo 'console=&quot;comconsole,vidconsole&quot;' &gt;&gt; /boot/loader.conf
+echo 'autoboot_delay=&quot;1&quot;' &gt;&gt; /boot/loader.conf
+</code></pre>
+
+<h2 id="shrink-image">Shrink image</h2>
+
+<p>Halt your vm</p>
+
+<p><code>halt -p</code></p>
+
+<p>Now it it time to shrink your image to be more smaller.<br />
+Locate your vm data file. In my case, it is <code>/var/lib/libvirt/images/</code></p>
+
+<pre><code>root@ubuntu-desktop:/var/lib/libvirt/images# ls -lh
+total 11G
+-rw------- 1 root root 11G août  15 21:11 freebsd-current.qcow2
+</code></pre>
+
+<p>To shrink it:</p>
+
+<pre><code>qemu-img convert -O qcow2 freebsd-current.qcow2 freebsd-current_small.qcow2
+</code></pre>
+
+<p><code>ls -lh</code></p>
+
+<pre><code>root@ubuntu-desktop:/var/lib/libvirt/images# ls -lh
+total 12G
+-rw------- 1 root root  11G août  15 21:11 freebsd-current.qcow2
+-rw-r--r-- 1 root root 1,2G août  15 21:18 freebsd-current_small.qcow2
+</code></pre>
+
+<h1 id="upload-your-freebsd-openstack-image-to-ovh-public-cloud">Upload your FreeBSD openstack image to OVH Public Cloud</h1>
+
+<p>It&rsquo;s time to upload our image.<br />
+First, you need to load your openrc.sh profile (read prerequisites section) and display actual images to see if your openstack client is correctly configured</p>
+
+<pre><code>. ~/openrc.sh
+openstack image list
+</code></pre>
+
+<p><img src="/pictures/freebsd_OVH-create/31.png" alt="ffa5e804-890b-41ad-9012-65e240aa2b6a.png" /></p>
+
+<p>Now upload the image:</p>
+
+<pre><code>openstack image create --private --disk-format qcow2 --container-format bare --property image_original_user=freebsd --property hw_disk_bus='scsi' --property hw_scsi_model=virtio-scsi --file freebsd-current_small.qcow2 freebsd-current_phase-1
+</code></pre>
+
+<pre><code>+------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Field            | Value                                                                                                                                                                                                               |
++------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| checksum         | XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX                                                                                                                                                                                    |
+| container_format | bare                                                                                                                                                                                                                |
+| created_at       | 2019-08-15T19:33:38Z                                                                                                                                                                                                |
+| disk_format      | qcow2                                                                                                                                                                                                               |
+| file             | /v2/images/XXXXXXXXXXXXXXXX/file                                                                                                                                                                |
+| id               | XXXXXXXXXXXXXXXXXXXXXXXXXX                                                                                                                                                                                |
+| min_disk         | 0                                                                                                                                                                                                                   |
+| min_ram          | 0                                                                                                                                                                                                                   |
+| name             | freebsd-current_phase-1                                                                                                                                                                                             |
+| owner            | XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX                                                                                                                                                                                    |
+| properties       | direct_url='swift+config://ref1/glance/XXXXXXXXb3-fb65d7c74b9f', hw_scsi_model='virtio-scsi', locations='[{'url': 'swift+config://ref1/glance/XXXXXXXXXXXXXXb3-fb65d7c74b9f', 'metadata': {}}]' |
+| protected        | False                                                                                                                                                                                                               |
+| schema           | /v2/schemas/image                                                                                                                                                                                                   |
+| size             | 1196621824                                                                                                                                                                                                          |
+| status           | active                                                                                                                                                                                                              |
+| tags             |                                                                                                                                                                                                                     |
+| updated_at       | 2019-08-15T22:19:29Z                                                                                                                                                                                                |
+| virtual_size     | None                                                                                                                                                                                                                |
+| visibility       | private                                                                                                                                                                                                             |
++------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+</code></pre>
+
+<p>Verify image</p>
+
+<pre><code>openstack image list --private
++--------------------------------------+-------------------------+--------+
+| ID                                   | Name                    | Status |
++--------------------------------------+-------------------------+--------+
+| f5d9db47-ddc1-49c3-a7b3-fb65d7c74b9f | freebsd-current_phase-1 | active |
++--------------------------------------+-------------------------+--------+
+</code></pre>
+
+<p><strong>Important:</strong><br />
+Don&rsquo;t use this image for your production or anything else. It is just a draft and we&rsquo;ll use it in the next section to build the final image, with cloud-init and another things.</p>
+
+<h1 id="using-hashicorp-packer-to-build-the-final-freebsd-current-openstack-image">Using HashiCorp Packer to build the final FreeBSD-CURRENT OpenStack image</h1>
+
+<p>In this step, we&rsquo;ll use Packer to build our final image.<br />
+The template will:</p>
+
+<ul>
+<li>copy <code>cloud-init.sh</code> script to <code>/etc/rc.local</code></li>
+<li>resize disk partition and the zpool</li>
+<li>download FreeBSD code source on github</li>
+<li>Build world and kernel</li>
+<li>Install kernel and world</li>
+<li>Upgrade packages</li>
+<li>Set no password to root and freebsd users</li>
+</ul>
+
+<p>First, add your packer ssh key we created earlier</p>
+
+<pre><code>ssh-add ~/.ssh/id_rsa_packer
+</code></pre>
+
+<p>Display and note your ID Ext-Net network. You&rsquo;ll need it to configure Packer.</p>
+
+<pre><code>openstack network list --name Ext-Net -c ID
++--------------------------------------+
+| ID                                   |
++--------------------------------------+
+| xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx |
++--------------------------------------+
+</code></pre>
+
+<p>Clone my Packer template</p>
+
+<pre><code>git clone https://github.com/fredericalix/packer-freebsd.git
+cd packer-freebsd
+mkdir /var/tmp/packer
+</code></pre>
+
+<p>Edit <code>openstack_ovh.json</code> and replace the networks section with your network uuid</p>
+
+<pre><code class="language-json">{
+  &quot;builders&quot;: [
+    {
+      &quot;flavor&quot;: &quot;b2-7&quot;,
+      &quot;image_name&quot;: &quot;freebsd-current_final&quot;,
+      &quot;image_visibility&quot;: &quot;private&quot;,
+      &quot;insecure&quot;: &quot;false&quot;,
+      &quot;networks&quot;: [
+        &quot;xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&quot;
+      ],
+      ...
+</code></pre>
+
+<p>Now run Packer and take a very long coffee.<br />
+The buildworld operation take ~ 4 hours.</p>
+
+<pre><code>packer build openstack_ovh.json
+</code></pre>
+
+<p>When it will be over, verify image availability</p>
+
+<pre><code>openstack image list --private
++--------------------------------------+-------------------------+--------+
+| ID                                   | Name                    | Status |
++--------------------------------------+-------------------------+--------+
+| 70556385-12ea-43fc-967b-4b3afa8326bf | freebsd-current_final   | active |
+| f5d9db47-ddc1-49c3-a7b3-fb65d7c74b9f | freebsd-current_phase-1 | active |
++--------------------------------------+-------------------------+--------+
+</code></pre>
+
+<p>Now you can use it ;)</p>
+
+<p>Have fun !</p>
+
+</article>
+
+
+
+</html>

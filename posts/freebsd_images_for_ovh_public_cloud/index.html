@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<title>FreeBSD images for OVH Public Cloud | Fralix Blog</title>
+<meta charset="utf-8">
+<meta name="generator" content="Hugo 0.57.2" />
+<meta name="description" content="FreeBSD images for OVH Public Cloud">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="canonical" href="https://www.fralix.fr/posts/freebsd_images_for_ovh_public_cloud/">
+<link rel="alternate" type="application/rss+xml" href="" title="Fralix Blog">
+<link rel="stylesheet" href="https://www.fralix.fr/css/theme.css">
+<link rel="stylesheet" href="https://www.fralix.fr/css/classes.css">
+
+<header class="dark">
+  <h2><a href="https://www.fralix.fr">Fralix Blog</a></h2>
+  <nav>
+    
+      <a href="/">Home</a>
+    
+      <a href="/tags/">Tags</a>
+    
+      <a href="https://www.doyoubuzz.com/alix-frederic">About Me</a>
+    
+  </nav>
+</header>
+
+<article>
+  <header>
+    <h1><a href="https://www.fralix.fr/posts/freebsd_images_for_ovh_public_cloud/">FreeBSD images for OVH Public Cloud</a></h1>
+    <p class="meta"><time datetime="2019-08-12T00:00:00Z">August 12, 2019</time></p>
+  </header>
+  <nav id="TableOfContents">
+<ul>
+<li><a href="#images">Images</a></li>
+<li><a href="#install-image-with-terminal-emulator">Install image with terminal emulator</a>
+<ul>
+<li><a href="#example-deploy-freebsd-12-0-release-image">Example: Deploy FreeBSD-12.0-RELEASE image</a></li>
+</ul></li>
+<li><a href="#install-image-with-openstack-horizon-web-ui">Install image with OpenStack Horizon web UI</a></li>
+</ul>
+</nav>
+
+  
+
+<p><img src="/pictures/freebsd_ovh_building.png" alt="freebsd_ovh_building.png" /></p>
+
+<h1 id="images">Images</h1>
+
+<table>
+<thead>
+<tr>
+<th><strong>Name</strong></th>
+<th><strong>Link</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>FreeBSD-12.0-RELEASE</td>
+<td><a href="https://storage.gra5.cloud.ovh.net/v1/AUTH_b49a48a77ecf40ff9e51a30fdf28633c/freebsd/freebsd-12.0-RELEASE.qcow2">download</a></td>
+<td>ZFS zroot + cloud-init (FreeBSD 12.0-RELEASE-p9 GENERIC)</td>
+</tr>
+
+<tr>
+<td>FreeBSD-12.0-RELEASE-custom</td>
+<td><a href="https://storage.gra5.cloud.ovh.net/v1/AUTH_b49a48a77ecf40ff9e51a30fdf28633c/freebsd/freebsd-12.0-RELEASE-custom.qcow2">download</a></td>
+<td>ZFS zroot + cloud-init + locale en_US-UTF8 + vrack configured</td>
+</tr>
+
+<tr>
+<td>FreeBSD-CURRENT</td>
+<td><a href="https://storage.gra5.cloud.ovh.net/v1/AUTH_b49a48a77ecf40ff9e51a30fdf28633c/freebsd/freebsd-current.qcow2">download</a></td>
+<td>ZFS zroot + cloud-init</td>
+</tr>
+
+<tr>
+<td>FreeBSD-CURRENT-custom</td>
+<td><em>Soon</em></td>
+<td>ZFS zroot + cloud-init + locale en_US-UTF8 + vrack configured</td>
+</tr>
+</tbody>
+</table>
+
+<h1 id="install-image-with-terminal-emulator">Install image with terminal emulator</h1>
+
+<p>You need openstack client and your openstack openrc file.</p>
+
+<h2 id="example-deploy-freebsd-12-0-release-image">Example: Deploy FreeBSD-12.0-RELEASE image</h2>
+
+<pre><code>wget https://storage.gra5.cloud.ovh.net/v1/AUTH_b49a48a77ecf40ff9e51a30fdf28633c/freebsd/freebsd-12.0-RELEASE.qcow2
+. ~/openrc.sh
+openstack image create --private --disk-format qcow2 \
+--container-format bare --property image_original_user=freebsd \
+--property hw_disk_bus='scsi' --property hw_scsi_model=virtio-scsi \
+--file freebsd-12.0-RELEASE.qcow2 freebsd-12.0-RELEASE
+</code></pre>
+
+<h1 id="install-image-with-openstack-horizon-web-ui">Install image with OpenStack Horizon web UI</h1>
+
+<p>TODO</p>
+
+</article>
+
+
+
+</html>
