@@ -1,49 +1,49 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Tags on Fralix Blog</title>
-    <link>https://www.fralix.fr/tags/</link>
-    <description>Recent content in Tags on Fralix Blog</description>
+    <title>Tags on FredAlix Blog</title>
+    <link>https://www.fredalix.com/tags/</link>
+    <description>Recent content in Tags on FredAlix Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Mon, 12 Aug 2019 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="https://www.fralix.fr/tags/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://www.fredalix.com/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>FreeBSD</title>
-      <link>https://www.fralix.fr/tags/freebsd/</link>
+      <link>https://www.fredalix.com/tags/freebsd/</link>
       <pubDate>Mon, 12 Aug 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://www.fralix.fr/tags/freebsd/</guid>
+      <guid>https://www.fredalix.com/tags/freebsd/</guid>
       <description></description>
     </item>
     
     <item>
       <title>OpenStack</title>
-      <link>https://www.fralix.fr/tags/openstack/</link>
+      <link>https://www.fredalix.com/tags/openstack/</link>
       <pubDate>Mon, 12 Aug 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://www.fralix.fr/tags/openstack/</guid>
+      <guid>https://www.fredalix.com/tags/openstack/</guid>
       <description></description>
     </item>
     
     <item>
       <title>OVH</title>
-      <link>https://www.fralix.fr/tags/ovh/</link>
+      <link>https://www.fredalix.com/tags/ovh/</link>
       <pubDate>Mon, 12 Aug 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://www.fralix.fr/tags/ovh/</guid>
+      <guid>https://www.fredalix.com/tags/ovh/</guid>
       <description></description>
     </item>
     
     <item>
       <title>packer</title>
-      <link>https://www.fralix.fr/tags/packer/</link>
+      <link>https://www.fredalix.com/tags/packer/</link>
       <pubDate>Fri, 09 Aug 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://www.fralix.fr/tags/packer/</guid>
+      <guid>https://www.fredalix.com/tags/packer/</guid>
       <description></description>
     </item>
     

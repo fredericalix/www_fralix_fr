@@ -1,54 +1,54 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://www.fralix.fr/</loc>
+    <loc>https://www.fredalix.com/</loc>
     <lastmod>2019-08-12T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://www.fralix.fr/tags/freebsd/</loc>
+    <loc>https://www.fredalix.com/tags/freebsd/</loc>
     <lastmod>2019-08-12T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://www.fralix.fr/posts/freebsd_images_for_ovh_public_cloud/</loc>
+    <loc>https://www.fredalix.com/posts/freebsd_images_for_ovh_public_cloud/</loc>
     <lastmod>2019-08-12T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://www.fralix.fr/tags/openstack/</loc>
+    <loc>https://www.fredalix.com/tags/openstack/</loc>
     <lastmod>2019-08-12T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://www.fralix.fr/tags/ovh/</loc>
+    <loc>https://www.fredalix.com/tags/ovh/</loc>
     <lastmod>2019-08-12T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://www.fralix.fr/posts/</loc>
+    <loc>https://www.fredalix.com/posts/</loc>
     <lastmod>2019-08-12T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://www.fralix.fr/tags/</loc>
+    <loc>https://www.fredalix.com/tags/</loc>
     <lastmod>2019-08-12T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://www.fralix.fr/posts/create_freebsd-current_openstack_image_on_ovh_public_cloud/</loc>
+    <loc>https://www.fredalix.com/posts/create_freebsd-current_openstack_image_on_ovh_public_cloud/</loc>
     <lastmod>2019-08-09T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://www.fralix.fr/tags/packer/</loc>
+    <loc>https://www.fredalix.com/tags/packer/</loc>
     <lastmod>2019-08-09T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://www.fralix.fr/categories/</loc>
+    <loc>https://www.fredalix.com/categories/</loc>
   </url>
   
 </urlset>

@@ -1,22 +1,22 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>packer on Fralix Blog</title>
-    <link>https://www.fralix.fr/tags/packer/</link>
-    <description>Recent content in packer on Fralix Blog</description>
+    <title>packer on FredAlix Blog</title>
+    <link>https://www.fredalix.com/tags/packer/</link>
+    <description>Recent content in packer on FredAlix Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 09 Aug 2019 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="https://www.fralix.fr/tags/packer/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://www.fredalix.com/tags/packer/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Create FreeBSD Current OpenStack image on OVH Public Cloud</title>
-      <link>https://www.fralix.fr/posts/create_freebsd-current_openstack_image_on_ovh_public_cloud/</link>
+      <link>https://www.fredalix.com/posts/create_freebsd-current_openstack_image_on_ovh_public_cloud/</link>
       <pubDate>Fri, 09 Aug 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://www.fralix.fr/posts/create_freebsd-current_openstack_image_on_ovh_public_cloud/</guid>
+      <guid>https://www.fredalix.com/posts/create_freebsd-current_openstack_image_on_ovh_public_cloud/</guid>
       <description>Introduction For my project, I want to use FreeBSD on the OVH&amp;rsquo;s Public Cloud.
 Behind this service, it&amp;rsquo;s OpenStack who run your instances.
 Actually, OVH just offer FreeBSD-11.0. Too old, and I prefer CURRENT branch and recompile it from source every week.
